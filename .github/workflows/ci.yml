@@ -1,0 +1,44 @@
+# This workflow becomes active when this directory is moved to its own repo.
+name: Ruby
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: ['3.2', '3.3', '3.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - run: bundle exec rake test
+      - run: gem build lm15.gemspec
+      - run: ruby -Ilib examples/offline.rb
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: pin
+        run: echo "sha=$(cat CONTRACT_PIN)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: lm15-dev/lm15-contract
+          ref: ${{ steps.pin.outputs.sha }}
+          path: .contract-oracle
+      - run: python tools/check_contract.py --contract .contract-oracle --direction all
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contract-report
+          path: tmp/reports/*.json

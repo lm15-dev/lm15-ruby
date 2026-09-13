@@ -1,0 +1,144 @@
+{
+  "Role": [
+    "user",
+    "assistant",
+    "tool",
+    "developer"
+  ],
+  "PartType": [
+    "text",
+    "image",
+    "audio",
+    "video",
+    "document",
+    "binary",
+    "tool_call",
+    "tool_result",
+    "thinking",
+    "refusal",
+    "citation"
+  ],
+  "FinishReason": [
+    "stop",
+    "length",
+    "tool_call",
+    "content_filter",
+    "error"
+  ],
+  "ReasoningEffort": [
+    "off",
+    "minimal",
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max"
+  ],
+  "ReasoningSummary": [
+    "auto",
+    "concise",
+    "detailed"
+  ],
+  "ErrorCode": [
+    "auth",
+    "billing",
+    "rate_limit",
+    "invalid_request",
+    "context_length",
+    "timeout",
+    "server",
+    "unsupported_model",
+    "unsupported_feature",
+    "not_configured",
+    "unknown_model",
+    "ambiguous_model",
+    "transport",
+    "lock_timeout",
+    "stream_assembly",
+    "provider"
+  ],
+  "StreamEventType": [
+    "start",
+    "delta",
+    "end",
+    "error"
+  ],
+  "BatchStatus": [
+    "queued",
+    "running",
+    "cancelling",
+    "completed",
+    "failed",
+    "cancelled",
+    "expired"
+  ],
+  "VideoStatus": [
+    "queued",
+    "running",
+    "completed",
+    "failed",
+    "cancelled"
+  ],
+  "BatchOutcome": [
+    "succeeded",
+    "errored",
+    "cancelled",
+    "expired"
+  ],
+  "FileReadiness": [
+    "pending",
+    "ready",
+    "failed"
+  ],
+  "AudioEncoding": [
+    "pcm16",
+    "opus",
+    "mp3",
+    "aac"
+  ],
+  "ToolChoiceMode": [
+    "auto",
+    "required",
+    "none"
+  ],
+  "LiveClientEventType": [
+    "turn",
+    "audio",
+    "image",
+    "text",
+    "tool_result",
+    "interrupt",
+    "end_audio"
+  ],
+  "LiveServerEventType": [
+    "audio",
+    "text",
+    "tool_call",
+    "tool_call_delta",
+    "interrupted",
+    "turn_end",
+    "usage",
+    "error"
+  ],
+  "DeltaType": [
+    "text",
+    "thinking",
+    "audio",
+    "image",
+    "tool_call",
+    "citation",
+    "continuation"
+  ],
+  "CacheRetention": [
+    "short",
+    "long"
+  ],
+  "CacheMode": [
+    "auto",
+    "off"
+  ],
+  "CachePrefix": [
+    "stable",
+    "history"
+  ]
+}

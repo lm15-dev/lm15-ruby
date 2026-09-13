@@ -1,0 +1,9 @@
+/.bundle/
+/vendor/
+/tmp/
+/pkg/
+/*.gem
+/Gemfile.lock
+/.contract-oracle/
+__pycache__/
+*.pyc

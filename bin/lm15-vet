@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
+require 'lm15'
+require 'lm15/vet'
+STDIN.each_line do |line|
+  next if line.strip.empty?
+  id = nil
+  stream_events = nil
+  begin
+    msg = JSON.parse(line)
+    id = msg['id']
+    result = case msg['op']
+    when 'capabilities'
+      {'language'=>'ruby','ops'=>%w[capabilities serde_roundtrip validate surface_dump normalize_error sigv4_sign build_request parse_response replay_stream resolve_model token_exchange_build token_exchange_parse explain_auth] + LM15::Vet::HANDLERS.keys, 'impl_version'=>LM15::VERSION}
+    when 'serde_roundtrip'
+      {'value'=>LM15.from_dict(msg['kind'],msg['value']).to_h}
+    when 'validate'
+      {'ok'=>true,'normalized'=>LM15.from_dict(msg['kind'],msg['value']).to_h}
+    when 'explain_auth'
+      keys = (msg['api_keys_providers'] || []).to_h { |p| [p,msg['sentinel']] }
+      report = LM15.explain_auth(msg['provider'],env:msg['env'] || {},api_keys:keys,credentials_path:msg['credentials_path'],files:msg['files'],settings:msg['settings'] || {})
+      {'configured'=>report.configured,'steps'=>report.steps.map { |s| {'kind'=>s.kind,'state'=>s.state} },'report_text'=>report.describe}
+    when 'token_exchange_build'
+      LM15::CloudTokens.build(msg['provider'],msg['rung'],msg['input'] || msg['credential'] || {},settings:msg['settings'] || {},now:Time.iso8601(msg['now']))
+    when 'token_exchange_parse'
+      begin
+        body = msg['body'] || JSON.parse(Base64.strict_decode64(msg['body_b64']))
+        c = LM15::CloudTokens.parse(msg['provider'],msg['rung'],msg['status'] || 200,body,now:Time.iso8601(msg['now']))
+        {'ok'=>true,'credential'=>c.to_h}
+      rescue LM15::LM15Error => e
+        {'ok'=>false,'error'=>{'class'=>e.class.name.split('::').last,'code'=>e.code}}
+      end
+    when 'resolve_model'
+      registry = msg.key?('catalog') ? LM15::ModelRegistry.new(msg['catalog']) : nil
+      LM15.resolve_model(msg['model'],registry:registry,env:msg['env'] || {}).to_h
+    when 'replay_stream'
+      lm = LM15.adapter_for(msg['provider'])
+      req = LM15.from_dict('request',msg['canonical_request'])
+      events = lm.replay_stream(req,Base64.strict_decode64(msg['body_b64'])).to_a
+      stream_events = events.map(&:to_h)
+      response = LM15.materialize_response(events,req)
+      {'events'=>stream_events,'canonical_response'=>response.to_h}
+    when 'parse_response'
+      lm = LM15.adapter_for(msg['provider'])
+      response = lm.parse_response(LM15.from_dict('request',msg['canonical_request']),LM15::HttpResponse.new(status:msg['status'] || 200,body:Base64.strict_decode64(msg['body_b64'])))
+      result = {'canonical_response'=>response.to_h}
+      result['unmapped'] = response.provider_data['_lm15_unmapped'] if response.provider_data&.key?('_lm15_unmapped')
+      result
+    when 'build_request'
+      cred = msg['credential'] ? LM15.from_dict('credential',msg['credential']) : msg['api_key']
+      opts = {credential:cred,settings:msg['settings'] || {},base_url:msg['base_url'],account_id:msg['provider'].tr('_','-') == 'openai-codex' ? 'test-account' : nil}
+      opts[:clock] = -> { Time.iso8601(msg['now']) } if msg['now']
+      LM15.adapter_for(msg['provider'],**opts).build_request(LM15.from_dict('request',msg['canonical_request']),!!msg['stream']).normalized
+    when 'sigv4_sign'
+      req = msg['request']
+      LM15::SigV4.sign(method:req['method'],url:req['url'],headers:req['headers'] || {},body:req['body'] || '',credential:LM15.from_dict('credential',msg['credential']),region:msg['region'],service:msg['service'],now:Time.iso8601(msg['now']))
+    when 'normalize_error'
+      e = LM15.adapter_for(msg['provider'],api_key:'vet-parse-only',settings:msg['settings'] || {}).normalize_error(msg['status'],msg['body_text'])
+      {'class'=>e.class.name.split('::').last,'code'=>e.code,'provider_code'=>e.provider_code,'message'=>e.message}
+    when 'surface_dump'
+      {'types'=>LM15::SCHEMA.keys.to_h { |n| [n,{'fields'=>LM15.const_get(n).fields.keys}] },'enums'=>LM15::VOCABULARIES}
+    else
+      handler = LM15::Vet::HANDLERS[msg['op']]
+      raise LM15::UnsupportedFeatureError, "unsupported op: #{msg['op']}" unless handler
+      handler.call(msg)
+    end
+    reply = {'id'=>id,'ok'=>true,'result'=>result}
+  rescue StandardError => e
+    error = {'type'=>e.class.name.split('::').last,'message'=>e.message}
+    error['code'] = e.code if e.is_a?(LM15::LM15Error)
+    error['partial_response'] = e.partial.to_h if e.is_a?(LM15::StreamAssemblyError) && e.partial
+    error['part_index'] = e.part_index if e.is_a?(LM15::StreamAssemblyError) && !e.part_index.nil?
+    error['model'] = e.model if e.is_a?(LM15::UnknownModelError) || e.is_a?(LM15::AmbiguousModelError)
+    error['providers'] = e.providers if e.is_a?(LM15::AmbiguousModelError)
+    reply = {'id'=>id,'ok'=>false,'error'=>error}
+    error['events'] = stream_events if e.is_a?(LM15::StreamAssemblyError) && stream_events
+  end
+  STDOUT.puts(JSON.generate(reply))
+  STDOUT.flush
+end

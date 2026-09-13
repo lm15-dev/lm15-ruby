@@ -1,0 +1,102 @@
+{
+  "date": "2026-09-12",
+  "ruby_version": "3.3.10",
+  "contract_revision": "cfed00771dffef2a218b5549151950bf5060ca06",
+  "python_reference_revision": "3bbbd3ee1bab40a1a61cc74db120c4a8eb7eb22b",
+  "typescript_reference_revision": "b1ab0df64f0608d790570db32a32860b2a48c8fd",
+  "contract": {
+    "request": {
+      "pass": 366,
+      "fail": 0,
+      "skip": 1
+    },
+    "response": {
+      "pass": 302,
+      "fail": 0,
+      "skip": 1
+    },
+    "stream": {
+      "pass": 40,
+      "fail": 0,
+      "skip": 0
+    },
+    "error": {
+      "pass": 84,
+      "fail": 0,
+      "skip": 0
+    },
+    "serde": {
+      "pass": 115,
+      "fail": 0,
+      "skip": 0
+    },
+    "auth": {
+      "pass": 43,
+      "fail": 0,
+      "skip": 0
+    },
+    "token": {
+      "pass": 43,
+      "fail": 0,
+      "skip": 0
+    },
+    "models": {
+      "pass": 34,
+      "fail": 0,
+      "skip": 0
+    },
+    "live": {
+      "pass": 24,
+      "fail": 0,
+      "skip": 0
+    },
+    "files": {
+      "pass": 48,
+      "fail": 0,
+      "skip": 0
+    },
+    "batch": {
+      "pass": 41,
+      "fail": 0,
+      "skip": 0
+    },
+    "generation": {
+      "pass": 20,
+      "fail": 0,
+      "skip": 0
+    },
+    "video": {
+      "pass": 27,
+      "fail": 0,
+      "skip": 0
+    },
+    "cache": {
+      "pass": 11,
+      "fail": 0,
+      "skip": 0
+    },
+    "router": {
+      "pass": 22,
+      "fail": 0,
+      "skip": 0
+    },
+    "ingest": {
+      "pass": 160,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "native_tests": {
+    "tests": 40,
+    "assertions": 181,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "differential": {
+    "checks": 28,
+    "passed": 28
+  },
+  "live_provider_calls": false,
+  "harness_network_sandbox_enforced": false
+}

@@ -1,0 +1,1768 @@
+{
+  "ContinuationState": {
+    "provider": {
+      "type": "str",
+      "init": true
+    },
+    "kind": {
+      "type": "ContinuationKind",
+      "init": true
+    },
+    "data": {
+      "type": "JsonObject",
+      "init": true,
+      "default": {}
+    }
+  },
+  "TextPart": {
+    "text": {
+      "type": "str",
+      "init": true
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['text']",
+      "init": false,
+      "default": "text"
+    }
+  },
+  "ImagePart": {
+    "media_type": {
+      "type": "str",
+      "init": true,
+      "default": "image/png"
+    },
+    "data": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "file_id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "path": {
+      "type": "Path | None",
+      "init": true,
+      "default": null
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "detail": {
+      "type": "Literal['low', 'high', 'auto'] | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['image']",
+      "init": false,
+      "default": "image"
+    }
+  },
+  "AudioPart": {
+    "media_type": {
+      "type": "str",
+      "init": true,
+      "default": "audio/wav"
+    },
+    "data": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "file_id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "path": {
+      "type": "Path | None",
+      "init": true,
+      "default": null
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['audio']",
+      "init": false,
+      "default": "audio"
+    }
+  },
+  "VideoPart": {
+    "media_type": {
+      "type": "str",
+      "init": true,
+      "default": "video/mp4"
+    },
+    "data": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "file_id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "path": {
+      "type": "Path | None",
+      "init": true,
+      "default": null
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['video']",
+      "init": false,
+      "default": "video"
+    }
+  },
+  "DocumentPart": {
+    "media_type": {
+      "type": "str",
+      "init": true,
+      "default": "application/pdf"
+    },
+    "data": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "file_id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "path": {
+      "type": "Path | None",
+      "init": true,
+      "default": null
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['document']",
+      "init": false,
+      "default": "document"
+    }
+  },
+  "BinaryPart": {
+    "media_type": {
+      "type": "str",
+      "init": true,
+      "default": "application/octet-stream"
+    },
+    "data": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "file_id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "path": {
+      "type": "Path | None",
+      "init": true,
+      "default": null
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['binary']",
+      "init": false,
+      "default": "binary"
+    }
+  },
+  "ToolCallPart": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "name": {
+      "type": "str",
+      "init": true
+    },
+    "input": {
+      "type": "JsonObject",
+      "init": true
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['tool_call']",
+      "init": false,
+      "default": "tool_call"
+    }
+  },
+  "ToolResultPart": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "content": {
+      "type": "tuple[ToolResultContentPart, ...]",
+      "init": true
+    },
+    "name": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "is_error": {
+      "type": "bool",
+      "init": true,
+      "default": false
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['tool_result']",
+      "init": false,
+      "default": "tool_result"
+    }
+  },
+  "ThinkingPart": {
+    "text": {
+      "type": "str",
+      "init": true
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['thinking']",
+      "init": false,
+      "default": "thinking"
+    }
+  },
+  "RefusalPart": {
+    "text": {
+      "type": "str",
+      "init": true
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['refusal']",
+      "init": false,
+      "default": "refusal"
+    }
+  },
+  "CitationPart": {
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "title": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "text": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['citation']",
+      "init": false,
+      "default": "citation"
+    }
+  },
+  "Message": {
+    "role": {
+      "type": "Role",
+      "init": true
+    },
+    "parts": {
+      "type": "tuple[Part, ...]",
+      "init": true
+    },
+    "continuation": {
+      "type": "tuple[ContinuationState, ...]",
+      "init": true,
+      "default": []
+    }
+  },
+  "TextDelta": {
+    "text": {
+      "type": "str",
+      "init": true
+    },
+    "part_index": {
+      "type": "int",
+      "init": true,
+      "default": 0
+    },
+    "logprobs": {
+      "type": "tuple[TokenLogprob, ...]",
+      "init": true,
+      "default": []
+    },
+    "type": {
+      "type": "Literal['text']",
+      "init": false,
+      "default": "text"
+    }
+  },
+  "ThinkingDelta": {
+    "text": {
+      "type": "str",
+      "init": true
+    },
+    "part_index": {
+      "type": "int",
+      "init": true,
+      "default": 0
+    },
+    "type": {
+      "type": "Literal['thinking']",
+      "init": false,
+      "default": "thinking"
+    }
+  },
+  "AudioDelta": {
+    "data": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "file_id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "part_index": {
+      "type": "int",
+      "init": true,
+      "default": 0
+    },
+    "media_type": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['audio']",
+      "init": false,
+      "default": "audio"
+    }
+  },
+  "ImageDelta": {
+    "data": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "file_id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "part_index": {
+      "type": "int",
+      "init": true,
+      "default": 0
+    },
+    "media_type": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['image']",
+      "init": false,
+      "default": "image"
+    }
+  },
+  "ToolCallDelta": {
+    "input": {
+      "type": "str",
+      "init": true
+    },
+    "part_index": {
+      "type": "int",
+      "init": true,
+      "default": 0
+    },
+    "id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "name": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['tool_call']",
+      "init": false,
+      "default": "tool_call"
+    }
+  },
+  "CitationDelta": {
+    "text": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "url": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "title": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "part_index": {
+      "type": "int",
+      "init": true,
+      "default": 0
+    },
+    "type": {
+      "type": "Literal['citation']",
+      "init": false,
+      "default": "citation"
+    }
+  },
+  "ContinuationDelta": {
+    "provider": {
+      "type": "str",
+      "init": true
+    },
+    "kind": {
+      "type": "ContinuationKind",
+      "init": true
+    },
+    "data": {
+      "type": "JsonObject",
+      "init": true,
+      "default": {}
+    },
+    "part_index": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['continuation']",
+      "init": false,
+      "default": "continuation"
+    }
+  },
+  "ErrorDetail": {
+    "code": {
+      "type": "ErrorCode",
+      "init": true
+    },
+    "message": {
+      "type": "str",
+      "init": true
+    },
+    "provider_code": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "StreamStartEvent": {
+    "id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "model": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['start']",
+      "init": false,
+      "default": "start"
+    }
+  },
+  "StreamDeltaEvent": {
+    "delta": {
+      "type": "Delta",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['delta']",
+      "init": false,
+      "default": "delta"
+    }
+  },
+  "StreamEndEvent": {
+    "finish_reason": {
+      "type": "FinishReason | None",
+      "init": true,
+      "default": null
+    },
+    "usage": {
+      "type": "Usage | None",
+      "init": true,
+      "default": null
+    },
+    "provider_data": {
+      "type": "ProviderData | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['end']",
+      "init": false,
+      "default": "end"
+    }
+  },
+  "StreamErrorEvent": {
+    "error": {
+      "type": "ErrorDetail",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['error']",
+      "init": false,
+      "default": "error"
+    }
+  },
+  "FunctionTool": {
+    "name": {
+      "type": "str",
+      "init": true
+    },
+    "description": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "parameters": {
+      "type": "JsonObject",
+      "init": true,
+      "default": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    "type": {
+      "type": "Literal['function']",
+      "init": false,
+      "default": "function"
+    }
+  },
+  "BuiltinTool": {
+    "name": {
+      "type": "str",
+      "init": true
+    },
+    "config": {
+      "type": "JsonObject | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['builtin']",
+      "init": false,
+      "default": "builtin"
+    }
+  },
+  "Reasoning": {
+    "effort": {
+      "type": "ReasoningEffort",
+      "init": true
+    },
+    "thinking_budget": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "summary": {
+      "type": "ReasoningSummary | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "CacheConfig": {
+    "mode": {
+      "type": "CacheMode",
+      "init": true,
+      "default": "auto"
+    },
+    "retention": {
+      "type": "CacheRetention | None",
+      "init": true,
+      "default": null
+    },
+    "key": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "prefix_until_index": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "prefix": {
+      "type": "CachePrefix | None",
+      "init": true,
+      "default": null
+    },
+    "resource": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "ToolChoice": {
+    "mode": {
+      "type": "ToolChoiceMode",
+      "init": true,
+      "default": "auto"
+    },
+    "allowed": {
+      "type": "tuple[str, ...]",
+      "init": true,
+      "default": []
+    },
+    "parallel": {
+      "type": "bool | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "Config": {
+    "max_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "temperature": {
+      "type": "float | None",
+      "init": true,
+      "default": null
+    },
+    "top_p": {
+      "type": "float | None",
+      "init": true,
+      "default": null
+    },
+    "top_k": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "stop": {
+      "type": "tuple[str, ...]",
+      "init": true,
+      "default": []
+    },
+    "response_format": {
+      "type": "JsonObject | None",
+      "init": true,
+      "default": null
+    },
+    "tool_choice": {
+      "type": "ToolChoice | None",
+      "init": true,
+      "default": null
+    },
+    "reasoning": {
+      "type": "Reasoning | None",
+      "init": true,
+      "default": null
+    },
+    "cache": {
+      "type": "CacheConfig | None",
+      "init": true,
+      "default": null
+    },
+    "service_tier": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "user_id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "store": {
+      "type": "bool | None",
+      "init": true,
+      "default": null
+    },
+    "logprobs": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "extensions": {
+      "type": "Extensions | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "Request": {
+    "model": {
+      "type": "str",
+      "init": true
+    },
+    "messages": {
+      "type": "tuple[Message, ...]",
+      "init": true
+    },
+    "system": {
+      "type": "str | tuple[PromptPart, ...] | None",
+      "init": true,
+      "default": null
+    },
+    "tools": {
+      "type": "tuple[Tool, ...]",
+      "init": true,
+      "default": []
+    },
+    "config": {
+      "type": "Config",
+      "init": true,
+      "default": {
+        "max_tokens": null,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null,
+        "stop": [],
+        "response_format": null,
+        "tool_choice": null,
+        "reasoning": null,
+        "cache": null,
+        "service_tier": null,
+        "user_id": null,
+        "store": null,
+        "logprobs": null,
+        "extensions": null
+      }
+    }
+  },
+  "TopLogprob": {
+    "token": {
+      "type": "str",
+      "init": true
+    },
+    "logprob": {
+      "type": "float",
+      "init": true
+    },
+    "bytes": {
+      "type": "tuple[int, ...] | None",
+      "init": true,
+      "default": null
+    },
+    "token_id": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "TokenLogprob": {
+    "token": {
+      "type": "str",
+      "init": true
+    },
+    "logprob": {
+      "type": "float",
+      "init": true
+    },
+    "bytes": {
+      "type": "tuple[int, ...] | None",
+      "init": true,
+      "default": null
+    },
+    "token_id": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "top": {
+      "type": "tuple[TopLogprob, ...]",
+      "init": true,
+      "default": []
+    }
+  },
+  "Usage": {
+    "input_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "output_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "total_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "cache_read_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "cache_write_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "reasoning_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "input_audio_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "output_audio_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "Response": {
+    "id": {
+      "type": "str | None",
+      "init": true
+    },
+    "model": {
+      "type": "str",
+      "init": true
+    },
+    "message": {
+      "type": "Message",
+      "init": true
+    },
+    "finish_reason": {
+      "type": "FinishReason",
+      "init": true
+    },
+    "usage": {
+      "type": "Usage",
+      "init": true
+    },
+    "logprobs": {
+      "type": "tuple[TokenLogprob, ...] | None",
+      "init": true,
+      "default": null
+    },
+    "provider_data": {
+      "type": "ProviderData | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "FileUploadRequest": {
+    "filename": {
+      "type": "str",
+      "init": true
+    },
+    "bytes_data": {
+      "type": "bytes | None",
+      "init": true,
+      "default": null
+    },
+    "media_type": {
+      "type": "str",
+      "init": true,
+      "default": "application/octet-stream"
+    },
+    "extensions": {
+      "type": "Extensions | None",
+      "init": true,
+      "default": null
+    },
+    "path": {
+      "type": "Path | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "FileInfo": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "filename": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "media_type": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "size_bytes": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "created_at": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "expires_at": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "readiness": {
+      "type": "FileReadiness",
+      "init": true,
+      "default": "ready"
+    },
+    "downloadable": {
+      "type": "bool | None",
+      "init": true,
+      "default": null
+    },
+    "provider_data": {
+      "type": "ProviderData | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "FilePage": {
+    "items": {
+      "type": "tuple[FileInfo, ...]",
+      "init": true,
+      "default": []
+    },
+    "next_cursor": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "CacheInfo": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "model": {
+      "type": "str",
+      "init": true
+    },
+    "tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "created_at": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "expires_at": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "label": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "provider_data": {
+      "type": "ProviderData | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "CachePage": {
+    "items": {
+      "type": "tuple[CacheInfo, ...]",
+      "init": true,
+      "default": []
+    },
+    "next_cursor": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "CachedPrefix": {
+    "prefix": {
+      "type": "Request",
+      "init": true
+    },
+    "resource": {
+      "type": "CacheInfo | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "BatchRequest": {
+    "model": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "requests": {
+      "type": "tuple[Request, ...]",
+      "init": true,
+      "default": []
+    },
+    "label": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "extensions": {
+      "type": "Extensions | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "BatchJobInfo": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "status": {
+      "type": "BatchStatus",
+      "init": true
+    },
+    "label": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "created_at": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "provider_data": {
+      "type": "ProviderData | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "BatchEntry": {
+    "index": {
+      "type": "int",
+      "init": true
+    },
+    "outcome": {
+      "type": "BatchOutcome",
+      "init": true
+    },
+    "response": {
+      "type": "Response | None",
+      "init": true,
+      "default": null
+    },
+    "error": {
+      "type": "ErrorDetail | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "ImageGenerationRequest": {
+    "model": {
+      "type": "str",
+      "init": true
+    },
+    "prompt": {
+      "type": "str",
+      "init": true
+    },
+    "size": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "images": {
+      "type": "tuple[ImagePart, ...]",
+      "init": true,
+      "default": []
+    },
+    "extensions": {
+      "type": "Extensions | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "ImageGenerationResponse": {
+    "images": {
+      "type": "tuple[ImagePart, ...]",
+      "init": true
+    },
+    "text": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "model": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "usage": {
+      "type": "Usage",
+      "init": true,
+      "default": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null,
+        "cache_read_tokens": null,
+        "cache_write_tokens": null,
+        "reasoning_tokens": null,
+        "input_audio_tokens": null,
+        "output_audio_tokens": null
+      }
+    },
+    "provider_data": {
+      "type": "ProviderData | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "SpeechGenerationRequest": {
+    "model": {
+      "type": "str",
+      "init": true
+    },
+    "prompt": {
+      "type": "str",
+      "init": true
+    },
+    "voice": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "format": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "extensions": {
+      "type": "Extensions | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "SpeechGenerationResponse": {
+    "audio": {
+      "type": "AudioPart",
+      "init": true
+    },
+    "id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "model": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "usage": {
+      "type": "Usage",
+      "init": true,
+      "default": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null,
+        "cache_read_tokens": null,
+        "cache_write_tokens": null,
+        "reasoning_tokens": null,
+        "input_audio_tokens": null,
+        "output_audio_tokens": null
+      }
+    },
+    "provider_data": {
+      "type": "ProviderData | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "VideoGenerationRequest": {
+    "model": {
+      "type": "str",
+      "init": true
+    },
+    "prompt": {
+      "type": "str",
+      "init": true
+    },
+    "seconds": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "images": {
+      "type": "tuple[ImagePart, ...]",
+      "init": true,
+      "default": []
+    },
+    "extensions": {
+      "type": "Extensions | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "VideoJobInfo": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "status": {
+      "type": "VideoStatus",
+      "init": true
+    },
+    "progress": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "created_at": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "model": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "provider_data": {
+      "type": "ProviderData | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "AudioFormat": {
+    "encoding": {
+      "type": "AudioEncoding",
+      "init": true
+    },
+    "sample_rate": {
+      "type": "int",
+      "init": true
+    },
+    "channels": {
+      "type": "int",
+      "init": true,
+      "default": 1
+    }
+  },
+  "LiveConfig": {
+    "model": {
+      "type": "str",
+      "init": true
+    },
+    "system": {
+      "type": "str | tuple[PromptPart, ...] | None",
+      "init": true,
+      "default": null
+    },
+    "tools": {
+      "type": "tuple[Tool, ...]",
+      "init": true,
+      "default": []
+    },
+    "voice": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "input_format": {
+      "type": "AudioFormat | None",
+      "init": true,
+      "default": null
+    },
+    "output_format": {
+      "type": "AudioFormat | None",
+      "init": true,
+      "default": null
+    },
+    "extensions": {
+      "type": "Extensions | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "LiveClientTurnEvent": {
+    "parts": {
+      "type": "tuple[PromptPart, ...]",
+      "init": true
+    },
+    "turn_complete": {
+      "type": "bool",
+      "init": true,
+      "default": true
+    },
+    "type": {
+      "type": "Literal['turn']",
+      "init": false,
+      "default": "turn"
+    }
+  },
+  "LiveClientAudioEvent": {
+    "data": {
+      "type": "str",
+      "init": true
+    },
+    "media_type": {
+      "type": "str",
+      "init": true,
+      "default": "audio/pcm;rate=16000"
+    },
+    "type": {
+      "type": "Literal['audio']",
+      "init": false,
+      "default": "audio"
+    }
+  },
+  "LiveClientImageEvent": {
+    "data": {
+      "type": "str",
+      "init": true
+    },
+    "media_type": {
+      "type": "str",
+      "init": true,
+      "default": "image/jpeg"
+    },
+    "type": {
+      "type": "Literal['image']",
+      "init": false,
+      "default": "image"
+    }
+  },
+  "LiveClientTextEvent": {
+    "text": {
+      "type": "str",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['text']",
+      "init": false,
+      "default": "text"
+    }
+  },
+  "LiveClientToolResultEvent": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "content": {
+      "type": "tuple[ToolResultContentPart, ...]",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['tool_result']",
+      "init": false,
+      "default": "tool_result"
+    }
+  },
+  "LiveClientInterruptEvent": {
+    "type": {
+      "type": "Literal['interrupt']",
+      "init": false,
+      "default": "interrupt"
+    }
+  },
+  "LiveClientEndAudioEvent": {
+    "type": {
+      "type": "Literal['end_audio']",
+      "init": false,
+      "default": "end_audio"
+    }
+  },
+  "LiveServerAudioEvent": {
+    "data": {
+      "type": "str",
+      "init": true
+    },
+    "media_type": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['audio']",
+      "init": false,
+      "default": "audio"
+    }
+  },
+  "LiveServerTextEvent": {
+    "text": {
+      "type": "str",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['text']",
+      "init": false,
+      "default": "text"
+    }
+  },
+  "LiveServerToolCallEvent": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "name": {
+      "type": "str",
+      "init": true
+    },
+    "input": {
+      "type": "JsonObject",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['tool_call']",
+      "init": false,
+      "default": "tool_call"
+    }
+  },
+  "LiveServerToolCallDeltaEvent": {
+    "input_delta": {
+      "type": "str",
+      "init": true
+    },
+    "id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "name": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "type": {
+      "type": "Literal['tool_call_delta']",
+      "init": false,
+      "default": "tool_call_delta"
+    }
+  },
+  "LiveServerInterruptedEvent": {
+    "type": {
+      "type": "Literal['interrupted']",
+      "init": false,
+      "default": "interrupted"
+    }
+  },
+  "LiveServerTurnEndEvent": {
+    "usage": {
+      "type": "Usage",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['turn_end']",
+      "init": false,
+      "default": "turn_end"
+    }
+  },
+  "LiveServerUsageEvent": {
+    "usage": {
+      "type": "Usage",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['usage']",
+      "init": false,
+      "default": "usage"
+    }
+  },
+  "LiveServerErrorEvent": {
+    "error": {
+      "type": "ErrorDetail",
+      "init": true
+    },
+    "type": {
+      "type": "Literal['error']",
+      "init": false,
+      "default": "error"
+    }
+  },
+  "InferencePricing": {
+    "input_per_million": {
+      "type": "float | None",
+      "init": true,
+      "default": null
+    },
+    "output_per_million": {
+      "type": "float | None",
+      "init": true,
+      "default": null
+    },
+    "cache_read_per_million": {
+      "type": "float | None",
+      "init": true,
+      "default": null
+    },
+    "cache_write_per_million": {
+      "type": "float | None",
+      "init": true,
+      "default": null
+    },
+    "currency": {
+      "type": "str",
+      "init": true,
+      "default": "USD"
+    },
+    "dimensions": {
+      "type": "JsonObject | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "InferenceModelInfo": {
+    "input_modalities": {
+      "type": "tuple[str, ...]",
+      "init": true,
+      "default": [
+        "text"
+      ]
+    },
+    "output_modalities": {
+      "type": "tuple[str, ...]",
+      "init": true,
+      "default": [
+        "text"
+      ]
+    },
+    "context_window": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "max_output_tokens": {
+      "type": "int | None",
+      "init": true,
+      "default": null
+    },
+    "supports_reasoning": {
+      "type": "bool",
+      "init": true,
+      "default": false
+    },
+    "reasoning_efforts": {
+      "type": "tuple[str, ...]",
+      "init": true,
+      "default": []
+    },
+    "pricing": {
+      "type": "InferencePricing | None",
+      "init": true,
+      "default": null
+    },
+    "extensions": {
+      "type": "JsonObject | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "ModelOrigin": {
+    "type": {
+      "type": "str",
+      "init": true,
+      "default": "provider"
+    },
+    "id": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "base_model": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "provider_data": {
+      "type": "JsonObject | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "ModelInfo": {
+    "id": {
+      "type": "str",
+      "init": true
+    },
+    "provider": {
+      "type": "str",
+      "init": true
+    },
+    "api_family": {
+      "type": "str",
+      "init": true
+    },
+    "aliases": {
+      "type": "tuple[str, ...]",
+      "init": true,
+      "default": []
+    },
+    "origin": {
+      "type": "ModelOrigin",
+      "init": true,
+      "default": {
+        "type": "provider",
+        "id": null,
+        "base_model": null,
+        "provider_data": null
+      }
+    },
+    "inference": {
+      "type": "InferenceModelInfo | None",
+      "init": true,
+      "default": null
+    },
+    "extensions": {
+      "type": "JsonObject | None",
+      "init": true,
+      "default": null
+    }
+  },
+  "ApiKey": {
+    "value": {
+      "type": "str",
+      "init": true
+    },
+    "kind": {
+      "type": "Literal['api_key']",
+      "init": false,
+      "default": "api_key"
+    }
+  },
+  "BearerToken": {
+    "value": {
+      "type": "str",
+      "init": true
+    },
+    "expires_at": {
+      "type": "datetime | None",
+      "init": true,
+      "default": null
+    },
+    "kind": {
+      "type": "Literal['bearer_token']",
+      "init": false,
+      "default": "bearer_token"
+    }
+  },
+  "AwsCredentials": {
+    "access_key_id": {
+      "type": "str",
+      "init": true
+    },
+    "secret_access_key": {
+      "type": "str",
+      "init": true
+    },
+    "session_token": {
+      "type": "str | None",
+      "init": true,
+      "default": null
+    },
+    "expires_at": {
+      "type": "datetime | None",
+      "init": true,
+      "default": null
+    },
+    "kind": {
+      "type": "Literal['aws']",
+      "init": false,
+      "default": "aws"
+    }
+  }
+}

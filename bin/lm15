@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+$LOAD_PATH.unshift(File.expand_path('../lib',__dir__))
+require 'lm15'
+command,argument = ARGV
+begin
+  case command
+  when '--version','version' then puts LM15::VERSION
+  when 'providers'
+    LM15::PROVIDERS.each { |id,d| puts "#{id}\t#{d['dialect']}\t#{d.dig('access','env_keys').join(',')}" }
+  when 'resolve'
+    abort 'Usage: lm15 resolve provider:model' unless argument
+    puts LM15.default_router.resolve(argument).describe
+  when 'auth'
+    action,provider = argument,ARGV[2]
+    abort 'Usage: lm15 auth doctor|login PROVIDER' unless provider
+    case action
+    when 'doctor' then puts LM15.explain_auth(provider).describe
+    when 'login' then LM15.login(provider)
+    else abort 'Usage: lm15 auth doctor|login PROVIDER' end
+  when 'models'
+    abort 'Usage: lm15 models PROVIDER' unless argument
+    LM15.adapter_for(argument).list_models.each { |model| puts JSON.generate(model.to_h) }
+  else
+    puts 'Usage: lm15 version | providers | resolve MODEL | models PROVIDER | auth doctor|login PROVIDER'
+    exit(command ? 1 : 0)
+  end
+rescue LM15::LM15Error => e
+  warn "#{e.class.name.split('::').last} (#{e.code}): #{e.message}"; exit 1
+end
