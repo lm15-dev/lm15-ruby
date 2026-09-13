@@ -6,10 +6,10 @@ Gem::Specification.new do |spec|
   spec.authors = ['LM15 contributors']
   spec.summary = 'One canonical interface to language model providers, in native Ruby'
   spec.description = 'LM15 Ruby provides canonical model requests and responses, four provider dialects, streaming, routing, cloud and OAuth credentials, tools, files, caches, batch and video jobs, media generation, and realtime sessions.'
-  spec.homepage = 'https://github.com/lm15-dev/lm15-contract/tree/main/ports/lm15-ruby'
+  spec.homepage = 'https://github.com/lm15-dev/lm15-ruby'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.2'
-  spec.files = Dir['lib/**/*','bin/*','docs/**/*','examples/**/*'] + %w[LICENSE README.md CONTRACT_PIN CONFORMANCE.md]
+  spec.files = Dir['lib/**/*','bin/*','docs/**/*','examples/**/*'] + %w[LICENSE README.md CHANGELOG.md CONTRACT_PIN CONFORMANCE.md]
   spec.bindir = 'bin'
   spec.executables = ['lm15','lm15-vet']
   spec.require_paths = ['lib']

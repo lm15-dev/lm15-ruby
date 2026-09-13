@@ -1,6 +1,6 @@
 # LM15 Ruby
 
-A native Ruby implementation of LM15: one `Request`, one `Response`, and the same canonical types across model providers. This directory is a complete gem project. It can be copied to a new `lm15-ruby` repository without depending on its parent directory.
+A native Ruby implementation of LM15: one `Request`, one `Response`, and the same canonical types across model providers. This is the standalone [lm15-ruby](https://github.com/lm15-dev/lm15-ruby) gem project; no parent repository is needed at runtime.
 
 The implementation follows the pinned [LM15 contract](https://github.com/lm15-dev/lm15-contract), with the [Python](https://github.com/lm15-dev/lm15-python) and [TypeScript](https://github.com/lm15-dev/lm15-ts) SDKs as implementation references. No Python or TypeScript code runs in the Ruby SDK. Python is used only by development tools to run the shared harness and compare independent requests.
 
@@ -64,7 +64,7 @@ See [providers](docs/providers.md) for every registered route, credential variab
 
 ## Streaming and tool calls
 
-`stream` yields canonical events. `response_stream` yields text and assembles the complete response. Close a stream when abandoning it; block form closes it automatically. A partial or prematurely closed stream cannot become a successful completed response.
+`stream` yields canonical events. `response_stream` yields text and assembles the complete response. Close a stream when abandoning it; block form closes it automatically. Response assembly releases its source on completion, failure or interruption. A partial or prematurely closed stream cannot become a successful completed response. Cleanup failures are recorded in `stream.cleanup_errors` and reported as `StreamCleanupWarning` without hiding the original error or a completed answer; warning text does not echo arbitrary transport messages.
 
 ```ruby
 lm = LM15::OpenAILM.new
@@ -107,6 +107,8 @@ end
 ## Canonical values and migration
 
 Values are validated on construction and frozen. Arrays of typed values are copied and frozen. Opaque JSON objects are validated but remain caller-owned; avoid mutating them after construction. `.with(...)` creates an updated value. JSON object keys are strings.
+
+Replaying a response must not lose its content. Responses carries assistant images/files using native input blocks; Chat Completions refuses unsupported assistant media before sending. Citations keep their title, URL and quoted text. See [history content](docs/history-content.md) for the per-format behavior and documentation evidence.
 
 ```ruby
 copy = LM15::Request.from_json(LM15.to_json(request))
@@ -212,6 +214,8 @@ python tools/check_contract.py --contract /tmp/lm15-contract-oracle --direction 
 # Optional, against a local Python reference checkout:
 python tools/differential.py --python-repo /path/to/lm15-python
 ```
+
+CI runs native tests on Linux (Ruby 3.2, 3.3 and 3.4) and macOS (Ruby 3.4), installs the built gem outside the checkout, and runs the pinned contract and independent comparison checks. Live provider validation remains separate; see [CONFORMANCE.md](CONFORMANCE.md).
 
 The checked-in schema, provider manifests, and compatibility tables are declarations exported from the reference SDK, not fixture answers. `tools/export_reference_data.py` regenerates them. The NDJSON shim delegates to the same public implementation as application code. See [CONFORMANCE.md](CONFORMANCE.md) for the exact validation record and [API.md](docs/API.md) for the Ruby API mapping.
 

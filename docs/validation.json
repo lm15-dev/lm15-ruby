@@ -1,6 +1,6 @@
 {
-  "date": "2026-09-12",
-  "ruby_version": "3.3.10",
+  "date": "2026-09-13",
+  "ruby_version": "3.4.9",
   "contract_revision": "cfed00771dffef2a218b5549151950bf5060ca06",
   "python_reference_revision": "3bbbd3ee1bab40a1a61cc74db120c4a8eb7eb22b",
   "typescript_reference_revision": "b1ab0df64f0608d790570db32a32860b2a48c8fd",
@@ -87,8 +87,8 @@
     }
   },
   "native_tests": {
-    "tests": 40,
-    "assertions": 181,
+    "tests": 65,
+    "assertions": 533,
     "failures": 0,
     "errors": 0,
     "skips": 0
@@ -97,6 +97,13 @@
     "checks": 28,
     "passed": 28
   },
+  "installed_gem_tests": {
+    "tests": 65,
+    "assertions": 533,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
   "live_provider_calls": false,
-  "harness_network_sandbox_enforced": false
+  "harness_network_sandbox_enforced": true
 }

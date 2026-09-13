@@ -9,8 +9,8 @@ module LM15
       path.to_s.split('/').each { |s| s == '..' ? kept.pop : kept << s unless s.empty? || s == '.' }
       normalized = (path.start_with?('/') ? '/' : '') + kept.join('/') + (path.end_with?('/') && !kept.empty? ? '/' : '')
       normalized = '/' if normalized.empty?
-      canonical_path = normalized.split('/',-1).map { |s| LM15.path_id(URI::DEFAULT_PARSER.unescape(s)) }.join('/')
-      canonical_query = (query || '').split('&').reject(&:empty?).map { |pair| k,v = pair.split('=',2); [k,v || ''].map { |x| URI::DEFAULT_PARSER.unescape(x.tr('+',' ')) } }.map { |k,v| [LM15.path_id(k),LM15.path_id(v)] }.sort.map { |k,v| "#{k}=#{v}" }.join('&')
+      canonical_path = normalized.split('/',-1).map { |s| LM15.path_id(URI::RFC2396_PARSER.unescape(s)) }.join('/')
+      canonical_query = (query || '').split('&').reject(&:empty?).map { |pair| k,v = pair.split('=',2); [k,v || ''].map { |x| URI::RFC2396_PARSER.unescape(x.tr('+',' ')) } }.map { |k,v| [LM15.path_id(k),LM15.path_id(v)] }.sort.map { |k,v| "#{k}=#{v}" }.join('&')
       h = headers.to_h.reject { |k,_| %w[authorization host x-amz-date x-amz-security-token].include?(k.downcase) }.transform_keys(&:downcase).transform_values { |v| (v.is_a?(Array) ? v.join(',') : v.to_s).split.join(' ') }
       date = now.utc.strftime('%Y%m%d'); stamp = now.utc.strftime('%Y%m%dT%H%M%SZ')
       h['host'] = host; h['x-amz-date'] = stamp

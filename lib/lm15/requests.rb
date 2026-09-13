@@ -59,7 +59,14 @@ module LM15
             rows << row
           end
         when 'assistant'
-          words = m.parts.filter_map { |p| p.text if %w[text refusal].include?(p.type) || (p.type == 'thinking' && c['thinking_replay'] == 'as_text' && !p.text.empty?) }
+          m.parts.each { |part| unsupported("#{part.type} in an assistant Chat Completions message") if MEDIA_KINDS.include?(part.type) }
+          words = m.parts.filter_map do |part|
+            case part.type
+            when 'text', 'refusal' then part.text
+            when 'citation' then LM15.parts_text([part])
+            when 'thinking' then part.text if c['thinking_replay'] == 'as_text' && !part.text.empty?
+            end
+          end
           row = {'role'=>'assistant','content'=>words.empty? ? nil : words.join("\n")}
           if c['thinking_replay'] == 'native'
             thought = m.parts.select { |p| p.type == 'thinking' }.map(&:text).reject(&:empty?).join("\n")
@@ -189,9 +196,21 @@ module LM15
           next
         end
         content = if m.role == 'assistant'
+          media = m.parts.any? { |part| MEDIA_KINDS.include?(part.type) }
+          if media
+            # Responses EasyInputMessage accepts assistant text, images and files,
+            # but not output/refusal blocks mixed into its input-content list.
+            m.parts.each do |part|
+              unsupported("#{part.type} in an assistant Responses message") if %w[audio video].include?(part.type)
+              unsupported('refusal mixed with assistant media on Responses') if part.type == 'refusal'
+            end
+          end
+          text_type = media ? 'input_text' : 'output_text'
           m.parts.filter_map do |part|
             case part.type
-            when 'text' then {'type'=>'output_text','text'=>part.text}
+            when 'text' then {'type'=>text_type,'text'=>part.text}
+            when 'citation' then {'type'=>text_type,'text'=>LM15.parts_text([part])}
+            when 'image', 'document', 'binary' then openai_input(part)
             when 'refusal' then {'type'=>'refusal','refusal'=>part.text}
             when 'thinking'
               state = LM15.continuation_data(part,'openai','reasoning_item')
@@ -199,7 +218,7 @@ module LM15
                 items << {'type'=>'reasoning'}.merge(state.select { |k,_| %w[id encrypted_content].include?(k) }).merge('summary'=>part.text.empty? ? [] : [{'type'=>'summary_text','text'=>part.text}])
                 nil
               elsif !part.text.empty?
-                {'type'=>'output_text','text'=>part.text}
+                {'type'=>text_type,'text'=>part.text}
               end
             end
           end
@@ -270,6 +289,7 @@ module LM15
     def anthropic_part(p,c)
       case p.type
       when 'text','refusal' then {'type'=>'text','text'=>p.text}
+      when 'citation' then {'type'=>'text','text'=>LM15.parts_text([p])}
       when 'image','document' then {'type'=>p.type,'source'=>anthropic_source(p)}
       when 'audio','video','binary' then unsupported("#{p.type} on Anthropic")
       when 'tool_call' then {'type'=>'tool_use','id'=>p.id,'name'=>p.name,'input'=>p.input}
@@ -368,6 +388,7 @@ module LM15
     def gemini_part(p,names = {})
       out = case p.type
       when 'text','thinking','refusal' then {'text'=>p.text}
+      when 'citation' then {'text'=>LM15.parts_text([p])}
       when *MEDIA_KINDS
         if p.url || p.file_id
           {'fileData'=>{'mimeType'=>p.media_type,'fileUri'=>p.url || p.file_id}}

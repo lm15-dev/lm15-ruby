@@ -136,7 +136,7 @@ module LM15
       out
     end
     def replay_stream(request,body)
-      raw = Enumerator.new { |out| LM15.parse_sse(body.each_line).each { |sse| parse_stream_events(request,sse).each { |e| out << e } } }
+      raw = Enumerator.new { |out| LM15.parse_sse_chunks([body]).each { |sse| parse_stream_events(request,sse).each { |e| out << e } } }
       LM15.coalesce_stream(raw,model:request.model)
     end
   end

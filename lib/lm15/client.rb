@@ -20,18 +20,10 @@ module LM15
             body = ''.b; source.read_body { |chunk| body << chunk }
             raise normalize_error(response.status,body,headers:response.headers)
           end
-          lines = Enumerator.new do |line_out|
-            buffer = ''.b
-            source.read_body do |chunk|
-              buffer << chunk.b
-              while (pos = buffer.index("\n"))
-                line_out << buffer.slice!(0,pos + 1)
-              end
-              raise TransportError,'SSE line exceeds limit' if buffer.bytesize > 65_536
-            end
-            line_out << buffer unless buffer.empty?
+          chunks = Enumerator.new do |chunk_out|
+            source.read_body { |chunk| chunk_out << chunk }
           end
-          LM15.parse_sse(lines).each { |event| parse_stream_events(request,event).each { |e| out << e } }
+          LM15.parse_sse_chunks(chunks).each { |event| parse_stream_events(request,event).each { |e| out << e } }
         end
       end
       PullStream.new(LM15.coalesce_stream(raw,model:request.model))

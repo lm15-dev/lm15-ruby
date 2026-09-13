@@ -5,5 +5,9 @@
 /*.gem
 /Gemfile.lock
 /.contract-oracle/
+/.reference-python/
+.env
+.env.*
+!.env.example
 __pycache__/
 *.pyc

@@ -1,14 +1,18 @@
-# This workflow becomes active when this directory is moved to its own repo.
 name: Ruby
 on: [push, pull_request]
 permissions:
   contents: read
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest]
         ruby: ['3.2', '3.3', '3.4']
+        include:
+          - os: macos-15
+            ruby: '3.4'
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -18,6 +22,21 @@ jobs:
       - run: bundle exec rake test
       - run: gem build lm15.gemspec
       - run: ruby -Ilib examples/offline.rb
+      - name: Install and use the packaged gem outside the checkout
+        shell: bash
+        run: |
+          package="$GITHUB_WORKSPACE/$(ruby -Ilib -rlm15/version -e 'print "lm15-#{LM15::VERSION}.gem"')"
+          smoke_dir=$(mktemp -d)
+          gem install "$package" --install-dir "$smoke_dir/gems" --minimal-deps --no-document
+          gem install minitest --version '~> 5.0' --install-dir "$smoke_dir/gems" --minimal-deps --no-document
+          cp examples/offline.rb "$smoke_dir/offline.rb"
+          cp -R test "$smoke_dir/test"
+          gem_path=$(ruby -e 'puts Gem.path.join(File::PATH_SEPARATOR)')
+          export GEM_PATH="$smoke_dir/gems:$gem_path"
+          cd "$smoke_dir"
+          ruby -rlm15 -e 'abort "loaded the wrong gem" unless File.realpath(Gem.loaded_specs.fetch("lm15").full_gem_path).start_with?(File.realpath("gems") + File::SEPARATOR)'
+          ruby offline.rb
+          ruby -Itest -e 'Dir["test/*_test.rb"].sort.each { |f| require_relative f }'
   contract:
     runs-on: ubuntu-latest
     steps:
@@ -37,8 +56,16 @@ jobs:
           ref: ${{ steps.pin.outputs.sha }}
           path: .contract-oracle
       - run: python tools/check_contract.py --contract .contract-oracle --direction all
+      - uses: actions/checkout@v4
+        with:
+          repository: lm15-dev/lm15-python
+          ref: 3bbbd3ee1bab40a1a61cc74db120c4a8eb7eb22b
+          path: .reference-python
+      - run: python tools/differential.py --python-repo .reference-python
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: contract-report
-          path: tmp/reports/*.json
+          path: |
+            tmp/reports/*.json
+            tmp/differential.json

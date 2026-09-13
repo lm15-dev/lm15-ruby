@@ -344,8 +344,11 @@ module LM15
       case p.type
       when 'text','thinking','citation' then {'type'=>'input_text','text'=>LM15.parts_text([p])}
       when 'image'
-        return {'type'=>'input_image','file_id'=>p.file_id} if p.file_id
-        out = {'type'=>'input_image','image_url'=>p.url || LM15.media_uri(p)}
+        out = if p.file_id
+          {'type'=>'input_image','file_id'=>p.file_id}
+        else
+          {'type'=>'input_image','image_url'=>p.url || LM15.media_uri(p)}
+        end
         out['detail'] = p.detail if p.detail
         out
       when 'audio'

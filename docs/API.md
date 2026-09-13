@@ -9,7 +9,8 @@ Canonical JSON uses the same snake_case keys and omission rules as the contract.
 | Provider | `OpenAILM.new`, `OpenAIChatLM.new`, `AnthropicLM.new`, `GeminiLM.new`, `XaiLM.new`, `ClaudeCodeLM.new`, `OpenAICodexLM.new`; `LM15.adapter_for(provider)` for any binding |
 | Complete | `lm.complete(request)`, `router.complete(request)`, `LM15.complete(request)` |
 | Raw stream | `lm.stream(request)` → closeable `Enumerable<StreamEvent>` |
-| Assembled stream | `lm.response_stream(request)` → `ResponseStream`; `.each` text, `.events` events, `.response` result, `.close` cleanup |
+| Assembled stream | `lm.response_stream(request)` → `ResponseStream`; `.each` text, `.events` events, `.response` result, `.close` cleanup, `.cleanup_errors` diagnostics |
+| SSE decoding | `LM15.parse_sse(lines)` for lines; `LM15.parse_sse_chunks(chunks)` for raw byte chunks |
 | Request | `Request.new(model:, messages:, system: nil, tools: [], config: Config.new)` |
 | Message | `Message.user`, `.developer`, `.assistant`, `.tool(id, content)` |
 | Response | `.message`, `.text`, `.tool_calls`, `.citations`, `.usage`, `.finish_reason`, `.json`, `.parse_json(default:)` |
@@ -49,6 +50,28 @@ A transport responds to `call(TransportRequest)`, returning `HttpResponse`. For 
 `TransportRequest` exposes `method`, `url`, lowercase `headers`, binary `body`, and connection/read/write timeouts. `HttpResponse.new(status:, headers:, body:)` lowercases response header names. Build/parse hooks are public for custom transports and contract testing; calls involving credential discovery can perform auth IO before a provider request exists.
 
 A realtime connector can be supplied as `lm.live(config, connect: callable)`. It receives `(url, headers:)` and returns a socket supporting `send(text)`, `recv` (text/bytes or nil at close), and `close`.
+
+## Stream lifecycle and SSE
+
+`ResponseStream` closes its source after normal exhaustion or failed consumption,
+including consumer exceptions and interruption. Breaking iteration alone keeps
+it resumable; explicitly `close` to abandon it. Consume and close on the same
+thread. A wrong-thread close raises `ThreadError` without marking the original
+stream closed. Cleanup errors never replace an existing error or a completed
+answer; they are recorded in `cleanup_errors` and reported through Ruby's warning
+channel. Warnings name the error class, not its potentially sensitive message.
+
+Both SSE entry points return an enumerator of `SSEEvent(data:, event:)` values.
+`parse_sse` still accepts lines with or without their separators.
+`parse_sse_chunks` accepts arbitrary byte strings whose boundaries have no
+meaning. Both support LF, CRLF, CR, an initial UTF-8 BOM and split UTF-8 data.
+Each data/event field removes at most one leading space, as SSE requires.
+
+Both accept `max_line_bytes:` (default 65,536, excluding separators) and
+`max_event_bytes:` (default 1,048,576, including one normalized separator per
+line). Comments and ignored fields count toward the event limit too. A final
+record without a trailing blank line is flushed for compatibility with the
+existing API; this does not excuse a missing canonical stream end event.
 
 ## Canonical declarations
 

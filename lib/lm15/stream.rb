@@ -1,26 +1,7 @@
 # frozen_string_literal: true
+require_relative 'sse'
+
 module LM15
-  SSEEvent = Struct.new(:data,:event, keyword_init: true)
-  def self.parse_sse(lines, max_line_bytes: 65_536, max_event_bytes: 1_048_576)
-    Enumerator.new do |out|
-      name,data,size = nil,[],0
-      lines.each do |raw|
-        raise TransportError,'SSE line exceeds limit' if raw.bytesize > max_line_bytes
-        size += raw.bytesize
-        raise TransportError,'SSE event exceeds limit' if size > max_event_bytes
-        line = raw.dup.force_encoding(Encoding::UTF_8).scrub.sub(/[\r\n]+\z/,'')
-        if line.empty?
-          out << SSEEvent.new(data:data.join("\n"),event:name) unless data.empty?
-          name,data,size = nil,[],0
-        elsif line.start_with?('event:')
-          name = line.delete_prefix('event:').strip
-        elsif line.start_with?('data:')
-          data << line.delete_prefix('data:').delete_prefix(' ')
-        end
-      end
-      out << SSEEvent.new(data:data.join("\n"),event:name) unless data.empty?
-    end
-  end
   def self.coalesce_stream(events,model: nil)
     Enumerator.new do |out|
       started,ended,finish,usage,data,rank = false,false,nil,nil,nil,-1
@@ -140,56 +121,109 @@ module LM15
   class ResponseStream
     include Enumerable
     attr_reader :cleanup_errors
-    def initialize(events,request)
-      @source = events.to_enum; @acc = StreamAccumulator.new(request); @done = false; @reading = false; @cleanup_errors = []
+
+    def initialize(events, request)
+      @source = events.respond_to?(:next) ? events : events.to_enum
+      @resource = events.respond_to?(:close) ? events : @source
+      @acc = StreamAccumulator.new(request)
+      @done = false
+      @closed = false
+      @reading = false
+      @cleanup_errors = []
     end
+
     def each
       return enum_for(:each) unless block_given?
       events { |e| yield e.delta.text if e.type == 'delta' && e.delta.type == 'text' }
     end
+
     def events
       return enum_for(:events) unless block_given?
       raise @failure if @failure
       return if @done
-      raise TypeError,'ResponseStream already has an active reader' if @reading
+      check_owner!
+      @owner ||= Thread.current
+      raise TypeError, 'ResponseStream already has an active reader' if @reading
       @reading = true
       begin
-        loop do
+        until @done
           begin
-            e = @source.next
+            event = @source.next
           rescue StopIteration
             @done = true
-            raise StreamAssemblyError.new('Stream ended without an end event (MAP-3)',partial:@acc.partial) unless @result
+            raise StreamAssemblyError.new('Stream ended without an end event (MAP-3)', partial: @acc.partial) unless @result
             break
           rescue StandardError => error
             raise unless @result
-            @cleanup_errors << error
-            warn "StreamCleanupWarning: #{error.class}: #{error.message}"
-            @done = true; break
+            report_cleanup_error(error)
+            @done = true
+            break
           end
-          raise StreamAssemblyError.new('Stream emitted an event after its end event (MAP-3)',partial:@result) if @result
-          raise LM15.error_from_code(e.error.code,e.error.message,provider_code:e.error.provider_code) if e.type == 'error'
-          @acc.push(e)
-          @result = @acc.response if e.type == 'end'
-          yield e
+          raise StreamAssemblyError.new('Stream emitted an event after its end event (MAP-3)', partial: @result) if @result
+          if event.type == 'error'
+            raise LM15.error_from_code(event.error.code, event.error.message, provider_code: event.error.provider_code)
+          end
+          @acc.push(event)
+          @result = @acc.response if event.type == 'end'
+          yield event
         end
-      rescue StandardError => error
+      rescue Exception => error
+        # Interrupt must unwind the transport too; preserve and re-raise it.
         @failure = error
+        @done = true
         raise
       ensure
         @reading = false
+        close_source if @done
       end
     end
+
     def response
       events { |_| }
+      raise @failure if @failure
       @result
     end
+
     def close
-      return if @done
+      return if @closed
+      check_owner!
       @done = true
-      @failure = StreamAssemblyError.new('Stream closed before its end event (MAP-3)',partial:@acc.partial) unless @result
-      @source.close if @source.respond_to?(:close)
+      begin
+        unless @result || @failure
+          @failure = StreamAssemblyError.new('Stream closed before its end event (MAP-3)', partial: @acc.partial)
+        end
+      rescue Exception => error
+        @failure = error
+        raise
+      ensure
+        close_source
+      end
       nil
+    end
+
+    private
+
+    def check_owner!
+      raise ThreadError, 'consume and close a stream on its owning thread' if @owner && @owner != Thread.current
+    end
+
+    def close_source
+      return if @closed
+      @closed = true
+      @resource.close if @resource.respond_to?(:close)
+    rescue StandardError => error
+      # A close failure must not replace the original error or a valid answer.
+      report_cleanup_error(error)
+    end
+
+    def report_cleanup_error(error)
+      @cleanup_errors << error
+      # MAP-3 requires a warning too. Avoid printing arbitrary transport messages
+      # that could include credentials; details remain available to the caller.
+      warn "StreamCleanupWarning: #{error.class} during stream cleanup; see cleanup_errors"
+    rescue StandardError => warning_error
+      # A broken warning destination cannot invalidate a completed response.
+      @cleanup_errors << warning_error
     end
   end
   def self.materialize_response(events,request) = ResponseStream.new(events,request).response
