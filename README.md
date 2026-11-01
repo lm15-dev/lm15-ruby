@@ -13,8 +13,8 @@ since, and the contract has grown (sign-in, judgments, ordered JSON
 checks, new providers).
 
 lm15 is released and stable (2.0) in [Python](https://github.com/lm15-dev/lm15-python),
-[TypeScript](https://github.com/lm15-dev/lm15-ts), [Rust](https://github.com/lm15-dev/lm15-rs)
-and [Go](https://github.com/lm15-dev/lm15-go). Guides:
+[TypeScript](https://github.com/lm15-dev/lm15-ts), [Rust](https://github.com/lm15-dev/lm15-rs),
+[Go](https://github.com/lm15-dev/lm15-go) and [R](https://github.com/lm15-dev/lm15-r). Guides:
 [lm15.dev](https://lm15.dev/docs/). For production, use one of those.
 
 ## What's here
