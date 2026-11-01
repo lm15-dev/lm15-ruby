@@ -12,9 +12,9 @@ every check: 1,380 of 1,380 in 16 directions. It has not been updated
 since, and the contract has grown (sign-in, judgments, ordered JSON
 checks, new providers).
 
-lm15 is released in [Python](https://github.com/lm15-dev/lm15-python) (1.0.1, stable),
+lm15 is released and stable (2.0) in [Python](https://github.com/lm15-dev/lm15-python),
 [TypeScript](https://github.com/lm15-dev/lm15-ts), [Rust](https://github.com/lm15-dev/lm15-rs)
-and [Go](https://github.com/lm15-dev/lm15-go) (release candidates). Guides:
+and [Go](https://github.com/lm15-dev/lm15-go). Guides:
 [lm15.dev](https://lm15.dev/docs/). For production, use one of those.
 
 ## What's here
